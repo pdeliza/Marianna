@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso | Reproductor</title>
+    <link rel="stylesheet" href="assets/css/loginpage.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Favicons (consistentes con player.html) -->
+    <link href="assets/img/favicon.jpg" rel="icon">
+    <link href="assets/img/apple-touch-icon.jpg" rel="apple-touch-icon">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <img src="assets/img/logo.jpg" alt="Logo" class="logo-img">
+                <h1>Mari<span>anna</span></h1>
+            </div>
+            <h2 >"La única forma de hacer<br>un gran trabajo es amar lo<br>que haces."</h2>
+            <form id="loginForm">
+                <!--Voz-->
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                    <button type="button" class="voice-btn" id="voiceBtn" aria-label="Reconocimiento de voz">
+                        <i class="bi bi-mic-fill" onclick="record()"></i>
+                        <script>
+                            function record() {
+                                var recognition = new webkitSpeechRecognition();
+                                recognition.lang = "es-SP";
+    
+                                recognition.onresult = function(event) {
+                                    document.getElementById('pass1').value = event.results[0][0].transcript;
+                                }
+                                recognition.start();
+                            }
+                        </script>
+                    </button>
+                </div>
+                <!--Entrada-->
+                <button type="submit" class="btn-primary">
+                    <span class="btn-text">Entrar</span>
+                    <i class="bi bi-arrow-right-circle-fill btn-icon"></i>
+                </button>
+            </form>
+            <p class="hint">Este rincón es para ti, para acompañarte siempre en tus días.</p>
+            <div class="loading-spinner hidden" id="loadingSpinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/loginauth.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar mensaje si viene de logout o sesión expirada
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('from')) {
+            const reason = urlParams.get('from');
+            const messages = {
+                'logout': 'Cerraste sesión. Suerte!',
+                'timeout': 'Sesión expirada por inactividad',
+                'expired': 'Tu sesión ha caducado'
+            };
+            if(messages[reason]) {
+                alert(messages[reason]);
+            }
+        }
+
+        // Configurar formulario de login
+        document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const auth = new Auth();
+            const password = document.getElementById('password').value.trim();
+            
+            if(auth.login(password)) {
+                // Recuperar estado previo del reproductor si existe
+                const savedState = JSON.parse(localStorage.getItem('playerLastState') || '{}');
+                if(savedState.currentTime) {
+                    localStorage.setItem('musicPlayerState', JSON.stringify({
+                        currentTime: savedState.currentTime,
+                        volume: savedState.volume
+                    }));
+                }
+                window.location.href = 'player.html';
+            } else {
+                alert('Intenta nuevamente!');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        });
+    });
+    </script>
+
+    <script>
+        document.getElementById('voiceBtn').addEventListener('click', function() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'es-ES';
+            recognition.interimResults = false;
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('password').value = transcript.toLowerCase().trim();
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Error en reconocimiento:', event.error);
+            };
+            
+            recognition.start();
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const auth = new Auth();
+            if(auth.login(document.getElementById('password').value)) {
+                window.location.href = 'player.html';
+            } else {
+                // alert('Código incorrecto. Intenta nuevamente.');
+            }
+        });
+    </script>
+
+    <script src="assets/js/loginauth.js"></script>
+    <script src="assets/js/auth-listener.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
