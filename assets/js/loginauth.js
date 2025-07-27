@@ -20,7 +20,7 @@ class Auth {
 
     logout() {
         localStorage.removeItem(this.storageKey);
-        window.location.href = 'loginpage.html?from=logout';
+        window.location.href = 'index.html?from=logout';
     }
 
     checkSession() {
