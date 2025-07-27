@@ -6,7 +6,7 @@ const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const ESSENTIAL_ASSETS = [
   '/',
   '/player.html',
-  '/loginpage.html',
+  '/index.html',
   '/assets/css/styleplayer.css',
   '/assets/js/app.js',
   '/assets/js/auth-listener.js',
