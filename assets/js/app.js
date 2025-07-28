@@ -1528,7 +1528,7 @@ if (isIOS) {
         const chatMenuItem = document.querySelector('.playlists li[data-playlist="chat"]');
         
         // 2. Configuración segura de la API Key (en producción usa variables de entorno)
-        const OPENAI_API_KEY = "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"; // 🔒 Reemplaza con tu key real
+        const OPENAI_API_KEY = "sk-xxx"; // 🔒 Reemplaza con tu key real
         const API_MODEL = "gpt-4o-mini"; // Usa "gpt-3.5-turbo" si es otro modelo
     
         // 3. Mostrar/ocultar chat (mejorado)
@@ -1616,7 +1616,7 @@ if (isIOS) {
                 addMessage(response, 'bot');
             } catch (error) {
                 typingIndicator.remove();
-                addMessage("Error al procesar tu pregunta. Por favor intenta nuevamente.", 'bot');
+                addMessage("Por ahora estamos haciendo algunos ajustes. Te avisaremos cuando todo esté listo!", 'bot');
                 console.error("Error en sendMessage:", error);
             } finally {
                 userMessageInput.disabled = false;
