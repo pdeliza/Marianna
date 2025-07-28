@@ -16,13 +16,17 @@ jobs:
           node-version: '18'
           
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install dotenv
+
+      - name: Create env file
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+          echo "API_ENDPOINT=${{ secrets.API_ENDPOINT }}" >> .env
         
       - name: Build project
         run: npm run build
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
