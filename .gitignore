@@ -52,9 +52,9 @@ secrets/
 api-keys.txt
 
 # Archivos de audio si no quieres subirlos
-*.mp3
-*.wav
-*.ogg
+#*.mp3
+#*.wav
+#*.ogg
 
 # Archivos de imágenes temporales
 temp-*.jpg
