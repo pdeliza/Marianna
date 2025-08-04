@@ -290,5 +290,13 @@
         }
     </script>
 
+    <script>
+    // Configuración inyectada por el servidor o GitHub Actions
+    window.config = {
+        OPENAI_API_KEY: '', // Se llenará automáticamente en producción
+        API_ENDPOINT: ''    // Usará el valor por defecto si está vacío
+    };
+    </script>
+
 </body>
 </html>
