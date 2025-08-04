@@ -685,9 +685,16 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             title: "Hoy por hoy",
-            artist: "Entrevista a Gabriel García Marquez",
+            artist: "Entrevista a Gabriel García Marquez - Parte 1",
             cover: "images/gabrielgarciamarquez.jpg",
-            file: "music/literario/Entrevista a Gabriel Garcia Marquez - Hoy por Hoy.mp3",
+            file: "music/literario/Entrevista a Gabriel Garcia Marquez - Hoy por Hoy1.mp3",
+            playlist: ["podcasts", "literario"]
+        },
+        {
+            title: "Hoy por hoy",
+            artist: "Entrevista a Gabriel García Marquez - Parte 2",
+            cover: "images/gabrielgarciamarquez.jpg",
+            file: "music/literario/Entrevista a Gabriel Garcia Marquez - Hoy por Hoy2.mp3",
             playlist: ["podcasts", "literario"]
         },
         {   //PSICOLOGICO
@@ -1528,8 +1535,15 @@ if (isIOS) {
         const chatMenuItem = document.querySelector('.playlists li[data-playlist="chat"]');
         
         // 2. Configuración segura de la API Key (en producción usa variables de entorno)
-        const OPENAI_API_KEY = "sk-xxx"; // 🔒 Reemplaza con tu key real
-        const API_MODEL = "gpt-4o-mini"; // Usa "gpt-3.5-turbo" si es otro modelo
+        const getApiConfiguration = () => {
+            return {
+                // En desarrollo: desde variables de entorno (vía GitHub Secrets)
+                // En producción: desde configuración global inyectada
+                apiKey: process.env.OPENAI_API_KEY || window.config?.OPENAI_API_KEY || '',
+                endpoint: process.env.API_ENDPOINT || window.config?.API_ENDPOINT || 'https://api.openai.com/v1/chat/completions',
+                model: "gpt-4o-mini" // Modelo óptimo para diccionario
+            };
+        };
     
         // 3. Mostrar/ocultar chat (mejorado)
         chatMenuItem.addEventListener('click', function(e) {
@@ -1627,18 +1641,18 @@ if (isIOS) {
     
         // 6. Función mejorada para la API (con manejo de errores robusto)
         async function generateBotResponse(userMessage) {
-            try {
-                if (!OPENAI_API_KEY.startsWith('sk-')) {
-                    throw new Error("API Key inválida");
-                }
-    
-                const startTime = performance.now();
-                
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const { apiKey, endpoint, model } = getApiConfiguration();
+        
+            if (!apiKey) {
+                throw new Error("Configuración de API no disponible");
+            }
+
+            try {                
+                const response = await fetch('API_ENDPOINT', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
                         model: API_MODEL,
@@ -1660,20 +1674,16 @@ if (isIOS) {
                 });
     
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error?.message || `HTTP ${response.status}`);
+                    const error = await response.json();
+                    throw new Error(error.error?.message || "Error en la API");
                 }
     
-                const data = await response.json();
-                const elapsedTime = ((performance.now() - startTime)/1000).toFixed(2);
-                console.log(`Respuesta recibida en ${elapsedTime}s`);
-                
+                const data = await response.json();                
                 return data.choices[0]?.message?.content?.trim() || "No se pudo generar respuesta";
                 
             } catch (error) {
                 console.error("Error en generateBotResponse:", {
                     error: error.message,
-                    model: API_MODEL,
                     timestamp: new Date().toISOString()
                 });
                 throw error;
